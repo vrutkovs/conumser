@@ -1,0 +1,62 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    image.openshift.io/triggers: |
+      [
+        {"from":{"kind":"ImageStreamTag","name":"conumser:bin"},"fieldPath":"spec.template.spec.containers[?(@.name==\"conumser\")].image"}
+      ]
+  labels:
+    app: conumser
+  name: conumser
+  namespace: conumser
+spec:
+  replicas: 1
+  selector:
+    deploymentconfig: conumser
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: pod-hunt
+        deploymentconfig: conumser
+    spec:
+      containers:
+        - image: ''
+          imagePullPolicy: Always
+          name: conumser
+          envFrom:
+          - secretRef:
+              name: telegram
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - conumser
+        from:
+          kind: ImageStreamTag
+          name: 'conumser:bin'
+      type: ImageChange
+    - type: ConfigChange

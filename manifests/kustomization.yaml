@@ -1,0 +1,9 @@
+namespace: conumser
+resources:
+  - 01_namespace.yaml
+  - 02_imagestream.yaml
+  - 03_buildconfig_src.yaml
+  - 04_buildconfig_bin.yaml
+  - 05_deployment.yaml
+  - 06_service.yaml
+  - 07_route.yaml

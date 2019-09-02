@@ -1,0 +1,47 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app: conumser
+  name: conumser-bin
+  namespace: pod-hunt
+spec:
+  failedBuildsHistoryLimit: 5
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: "conumser:bin"
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    dockerfile: |-
+      FROM registry.access.redhat.com/ubi8/ubi
+      COPY gobinary /usr/local/bin/conumser
+      EXPOSE 8080
+      ENTRYPOINT ["/usr/local/bin/conumser"]
+    images:
+    - as: null
+      from:
+        kind: ImageStreamTag
+        name: "conumser:src"
+      paths:
+      - destinationDir: .
+        sourcePath: /opt/app-root/gobinary
+    type: Dockerfile
+  strategy:
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: "conumser:ubi8"
+    type: Docker
+  successfulBuildsHistoryLimit: 5
+  triggers:
+  - type: ImageChange
+    imageChange:
+      from:
+        kind: ImageStreamTag
+        name: "conumser:src"
+  - type: ConfigChange
+  - type: ImageChange
