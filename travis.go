@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -22,6 +23,10 @@ type travisMessage struct {
 	Repo        travisRepo `json:"repository"  binding:"required"`
 }
 
+type travisForm struct {
+	Payload string `form:"payload" binding: "required"`
+}
+
 func getStatus(status string) string {
 	switch status {
 	case "Passed", "Fixed":
@@ -38,19 +43,26 @@ func (e *Env) travisMessage(c *gin.Context) {
 		return
 	}
 
+	var f travisForm
+	err := c.Bind(&f)
+	if err != nil {
+		log.Printf(err.Error())
+		c.JSON(http.StatusBadRequest, nil)
+		return
+	}
+
 	var m travisMessage
-	if err := c.BindJSON(&m); err == nil {
-		shortCommit := m.CommitSHA[:7]
-
-		repo := fmt.Sprintf("%s/%s@%s", m.RepoOwner, m.Repo.Name, m.Branch)
-		build := m.BuildNumber
-		result := getStatus(m.Status)
-
-		message := fmt.Sprintf("*Travis* %s\nBuild %s for commit %s %s", repo, build, shortCommit, result)
-		e.tgbot.sendMessage(e.room, message)
-		c.JSON(http.StatusOK, "Message sent")
-	} else {
+	if err := json.Unmarshal([]byte(f.Payload), &m); err != nil {
 		log.Printf(err.Error())
 		c.JSON(http.StatusBadRequest, nil)
 	}
+	shortCommit := m.CommitSHA[:7]
+
+	repo := fmt.Sprintf("%s/%s@%s", m.RepoOwner, m.Repo.Name, m.Branch)
+	build := m.BuildNumber
+	result := getStatus(m.Status)
+
+	message := fmt.Sprintf("*Travis* %s\nBuild %s for commit %s %s", repo, build, shortCommit, result)
+	e.tgbot.sendMessage(e.room, message)
+	c.JSON(http.StatusOK, "Message sent")
 }
