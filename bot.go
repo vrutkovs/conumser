@@ -22,7 +22,7 @@ func main() {
 	env := &Env{tgbot: tgbot}
 
 	// Generic webhook, which would display output in markdown
-	r.POST("/incoming", env.incoming)
+	r.POST("/incoming/:token", env.incoming)
 
 	// Travis check
 	// r.GET("/github-check", githubCheck)
