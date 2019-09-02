@@ -44,8 +44,7 @@ func (e *Env) travisMessage(c *gin.Context) {
 	}
 
 	var f travisForm
-	err := c.Bind(&f)
-	if err != nil {
+	if err := c.Bind(&f); err != nil {
 		log.Printf(err.Error())
 		c.JSON(http.StatusBadRequest, nil)
 		return
@@ -55,6 +54,7 @@ func (e *Env) travisMessage(c *gin.Context) {
 	if err := json.Unmarshal([]byte(f.Payload), &m); err != nil {
 		log.Printf(err.Error())
 		c.JSON(http.StatusBadRequest, nil)
+		return
 	}
 	shortCommit := m.CommitSHA[:7]
 
@@ -64,5 +64,6 @@ func (e *Env) travisMessage(c *gin.Context) {
 
 	message := fmt.Sprintf("*Travis* %s\nBuild %s for commit %s %s", repo, build, shortCommit, result)
 	e.tgbot.sendMessage(e.room, message)
+	log.Printf(fmt.Sprintf("Posted '%s' to '%s'", message, e.room))
 	c.JSON(http.StatusOK, "Message sent")
 }
