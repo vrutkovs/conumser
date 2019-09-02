@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -49,9 +50,7 @@ func (e *Env) travisMessage(c *gin.Context) {
 		e.tgbot.sendMessage(e.room, message)
 		c.JSON(http.StatusOK, "Message sent")
 	} else {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Message validation failed!",
-			"error":   err.Error(),
-		})
+		log.Printf(err.Error())
+		c.JSON(http.StatusBadRequest, nil)
 	}
 }
