@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,7 +21,8 @@ func main() {
 	if err != nil {
 		panic(fmt.Sprintf("Failed to create tgBot: %v", err))
 	}
-	env := &Env{tgbot: tgbot}
+	room := os.Getenv("TELEGRAM_ROOM")
+	env := &Env{tgbot: tgbot, room: room}
 
 	// Generic webhook, which would display output in markdown
 	r.POST("/incoming/:token", env.incoming)
