@@ -9,6 +9,7 @@ import (
 // Env holds references to useful objects in router funcs
 type Env struct {
 	tgbot *tgBot
+	room  string
 }
 
 func main() {
@@ -25,7 +26,7 @@ func main() {
 	r.POST("/incoming/:token", env.incoming)
 
 	// Travis check
-	// r.GET("/github-check", githubCheck)
+	r.POST("/travis/:token", env.travisMessage)
 
 	r.Run(":8080")
 }
