@@ -9,16 +9,16 @@ import (
 )
 
 type travisRepo struct {
-	Name string `json:"name"`
+	Name string `json:"name"  binding:"required"`
 }
 
 type travisMessage struct {
-	Branch      string     `json:"branch"`
-	BuildNumber string     `json:"number"`
-	CommitSHA   string     `json:"commit"`
-	Status      string     `json:"status_message"`
-	RepoOwner   string     `json:"owner_name"`
-	Repo        travisRepo `json:"repository"`
+	Branch      string     `json:"branch"  binding:"required"`
+	BuildNumber string     `json:"number"  binding:"required"`
+	CommitSHA   string     `json:"commit"  binding:"required"`
+	Status      string     `json:"status_message"  binding:"required"`
+	RepoOwner   string     `json:"owner_name"  binding:"required"`
+	Repo        travisRepo `json:"repository"  binding:"required"`
 }
 
 func getStatus(status string) string {
