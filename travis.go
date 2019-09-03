@@ -18,6 +18,7 @@ type travisRepo struct {
 type travisMessage struct {
 	Branch      string     `json:"branch"`
 	BuildNumber string     `json:"number"`
+	BuildURL    string     `json:"build_url"`
 	CommitSHA   string     `json:"commit"`
 	Status      string     `json:"status_message"`
 	Repo        travisRepo `json:"repository"`
@@ -59,10 +60,11 @@ func (e *Env) travisMessage(c *gin.Context) {
 	shortCommit := m.CommitSHA[:7]
 
 	repo := fmt.Sprintf("%s/%s@%s", m.Repo.Owner, m.Repo.Name, m.Branch)
-	build := m.BuildNumber
 	result := getStatus(m.Status)
 
-	message := fmt.Sprintf("*Travis* %s\nBuild #%s for commit %s %s", repo, build, shortCommit, result)
+	message := fmt.Sprintf(
+		"*Travis* %s\nBuild [#%s](%s) for commit %s %s",
+		repo, m.BuildNumber, m.BuildURL, shortCommit, result)
 	e.tgbot.sendMessage(e.room, message)
 	log.Printf(fmt.Sprintf("Posted '%s' to '%s'", message, e.room))
 	c.JSON(http.StatusOK, "Message sent")
