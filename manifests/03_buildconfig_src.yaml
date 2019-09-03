@@ -30,6 +30,6 @@ spec:
   triggers:
   - type: ImageChange
   - type: ConfigChange
-  - github:
+  - generic:
       secret: dbb3f5b90a1a1283
-    type: GitHub
+    type: Generic
