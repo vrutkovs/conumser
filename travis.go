@@ -11,16 +11,16 @@ import (
 )
 
 type travisRepo struct {
-	Name string `json:"name"  binding:"required"`
+	Name  string `json:"name"`
+	Owner string `json:"owner_name"`
 }
 
 type travisMessage struct {
-	Branch      string     `json:"branch"  binding:"required"`
-	BuildNumber string     `json:"number"  binding:"required"`
-	CommitSHA   string     `json:"commit"  binding:"required"`
-	Status      string     `json:"status_message"  binding:"required"`
-	RepoOwner   string     `json:"owner_name"  binding:"required"`
-	Repo        travisRepo `json:"repository"  binding:"required"`
+	Branch      string     `json:"branch"`
+	BuildNumber string     `json:"number"`
+	CommitSHA   string     `json:"commit"`
+	Status      string     `json:"status_message"`
+	Repo        travisRepo `json:"repository"`
 }
 
 type travisForm struct {
@@ -58,11 +58,11 @@ func (e *Env) travisMessage(c *gin.Context) {
 	}
 	shortCommit := m.CommitSHA[:7]
 
-	repo := fmt.Sprintf("%s/%s@%s", m.RepoOwner, m.Repo.Name, m.Branch)
+	repo := fmt.Sprintf("%s/%s@%s", m.Repo.Owner, m.Repo.Name, m.Branch)
 	build := m.BuildNumber
 	result := getStatus(m.Status)
 
-	message := fmt.Sprintf("*Travis* %s\nBuild %s for commit %s %s", repo, build, shortCommit, result)
+	message := fmt.Sprintf("*Travis* %s\nBuild #%s for commit %s %s", repo, build, shortCommit, result)
 	e.tgbot.sendMessage(e.room, message)
 	log.Printf(fmt.Sprintf("Posted '%s' to '%s'", message, e.room))
 	c.JSON(http.StatusOK, "Message sent")
