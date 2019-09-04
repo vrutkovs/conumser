@@ -12,7 +12,7 @@ jobs:
     - name: fetch s2i binary
       run: curl -L https://github.com/openshift/source-to-image/releases/download/v1.1.14/source-to-image-v1.1.14-874754de-linux-amd64.tar.gz | tar xvz
     - name: s2i build using golang 1.12
-      run: ./s2i build . registry.fedoraproject.org/f29/golang quay.io/vrutkovs/conumser:${GITHUB_REF}
+      run: ./s2i build . registry.fedoraproject.org/f29/golang quay.io/vrutkovs/conumser:master
     - uses: actions/docker/login@master
       env:
         DOCKER_REGISTRY_URL: quay.io
@@ -21,5 +21,5 @@ jobs:
       if: github.event_name == 'push'
     - uses: actions/docker/cli@master
       with:
-        args: "push quay.io/vrutkovs/conumser:${GITHUB_REF}"
+        args: "push quay.io/vrutkovs/conumser:master"
       if: github.event_name == 'push'
