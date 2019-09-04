@@ -1,0 +1,15 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Fetch s2i binary
+      run: curl -L https://github.com/openshift/source-to-image/releases/download/v1.1.14/source-to-image-v1.1.14-874754de-linux-amd64.tar.gz | tar xvz
+    - name: s2i build using golang 1.12
+      run: ./s2i build . registry.fedoraproject.org/f29/golang conumser:latest
