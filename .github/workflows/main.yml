@@ -14,16 +14,13 @@ jobs:
         path: .
         base: registry.fedoraproject.org/f29/golang
         image: conumser:src
-    - name: build bin-only container
-      run: |
-        mkdir bin-container && cd bin-container
-        {
-          echo "FROM registry.access.redhat.com/ubi8/ubi"
-          echo "COPY --from=conumser:src /opt/app-root/gobinary /usr/local/bin/conumser"
-          echo "EXPOSE 8080"
-          echo 'ENTRYPOINT ["/usr/local/bin/conumser"]'
-        } > Dockerfile
-        docker build -t quay.io/vrutkovs/conumser:latest .
+    - uses: vrutkovs/action-bin-container@master
+      with:
+        source_image: conumser:src
+        source_path: /opt/app-root/gobinary
+        binary_base: registry.access.redhat.com/ubi8/ubi
+        binary_path: /usr/local/bin/conumser
+        binary_image: quay.io/vrutkovs/conumser:latest
     - name: login to quay
       uses: actions/docker/login@master
       env:
