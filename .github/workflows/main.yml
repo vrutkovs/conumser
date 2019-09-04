@@ -12,7 +12,17 @@ jobs:
     - name: fetch s2i binary
       run: curl -L https://github.com/openshift/source-to-image/releases/download/v1.1.14/source-to-image-v1.1.14-874754de-linux-amd64.tar.gz | tar xvz
     - name: s2i build using golang 1.12
-      run: ./s2i build . registry.fedoraproject.org/f29/golang quay.io/vrutkovs/conumser:latest
+      run: ./s2i build . registry.fedoraproject.org/f29/golang conumser:src
+    - name: build bin-only container
+      run: |
+        mkdir bin-container && cd bin-container
+        {
+          echo "FROM registry.access.redhat.com/ubi8/ubi"
+          echo "COPY --from=conumser:src /opt/app-root/gobinary /usr/local/bin/conumser"
+          echo "EXPOSE 8080"
+          echo 'ENTRYPOINT ["/usr/local/bin/conumser"]'
+        } > Dockerfile
+        docker build -t quay.io/vrutkovs/conumser:latest .
     - name: login to quay
       uses: actions/docker/login@master
       env:
